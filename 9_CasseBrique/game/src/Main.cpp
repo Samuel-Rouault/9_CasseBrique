@@ -1,5 +1,8 @@
 #include "raylib.h"
+#include <iostream>
+#include <vector>
 
+using namespace std;
 // Initialisation des variables
 
 const int LARGEUR_ECRAN = 1280;
@@ -11,12 +14,27 @@ const int RAQUETTE_HAUTEUR = 32;
 const int RAQUETTE_POSITIONY = HAUTEUR_ECRAN - RAQUETTE_HAUTEUR - RAQUETTE_HAUTEUR / 2;
 const int RAQUETTE_POSITIONX = LARGEUR_ECRAN / 2 - RAQUETTE_LARGEUR / 2;
 const int RAQUETTE_VITESSE = 5;
+const int BRIQUE_LARGEUR = 128;
+const int BRIQUE_HAUTEUR = 40;
+const int BRIQUES_LIGNES = 5;
+const int BRIQUES_COLONNES = 10;
+const int BRIQUE_SEPARATEUR = 2;
 
 Rectangle balle{ 20, 50, BALLE_TAILLE,BALLE_TAILLE };
 int vitesseBalleX = BALLE_VITESSE;
 int vitesseBalleY = -BALLE_VITESSE;
 
 Rectangle raquette{ RAQUETTE_POSITIONX,RAQUETTE_POSITIONY,RAQUETTE_LARGEUR,RAQUETTE_HAUTEUR };
+
+// Structure de la brique
+
+struct Brique 
+{
+    Rectangle rect;
+};
+
+Rectangle rect{ 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR };
+Brique brique{ rect };
 
 
 // Initialisation des fonctions
@@ -104,9 +122,25 @@ void draw()
     ClearBackground(BLACK);
 
     // On dessine la balle et la raquette du joueur
+
     DrawRectangle(balle.x, balle.y, balle.width, balle.height, WHITE);
     DrawRectangle(raquette.x, raquette.y, raquette.width, raquette.height, WHITE);
 
+    // On dessine les briques à casser
+    vector <Brique> briques{};
+    for (int ligne = 0; ligne < BRIQUES_LIGNES; ligne++) 
+    {
+        for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++) 
+        {
+            brique = { rect.x = BRIQUE_LARGEUR * colonne, rect.y = BRIQUE_HAUTEUR * ligne, rect.width - BRIQUE_SEPARATEUR, rect.height - BRIQUE_SEPARATEUR };
+            briques.push_back(brique);
+        }             
+    }
+    for (Brique brique : briques) 
+    {
+        DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, WHITE);
+    }
+   
     EndDrawing();
 }
 
