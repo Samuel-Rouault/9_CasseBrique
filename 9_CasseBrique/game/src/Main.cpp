@@ -28,13 +28,20 @@ Rectangle raquette{ RAQUETTE_POSITIONX,RAQUETTE_POSITIONY,RAQUETTE_LARGEUR,RAQUE
 
 // Structure de la brique
 
+/// <summary>
+/// x / y / width / height
+/// </summary>
 struct Brique 
 {
     Rectangle rect;
 };
 
-Rectangle rect{ 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR };
-Brique brique{ rect };
+/// <summary>
+/// x / y / width / height
+/// </summary>
+Brique brique { { 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR } };    //Predfab brique
+vector <Brique> briques{};
+
 
 
 // Initialisation des fonctions
@@ -126,16 +133,7 @@ void draw()
     DrawRectangle(balle.x, balle.y, balle.width, balle.height, WHITE);
     DrawRectangle(raquette.x, raquette.y, raquette.width, raquette.height, WHITE);
 
-    // On dessine les briques à casser
-    vector <Brique> briques{};
-    for (int ligne = 0; ligne < BRIQUES_LIGNES; ligne++) 
-    {
-        for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++) 
-        {
-            brique = { rect.x = BRIQUE_LARGEUR * colonne, rect.y = BRIQUE_HAUTEUR * ligne, rect.width - BRIQUE_SEPARATEUR, rect.height - BRIQUE_SEPARATEUR };
-            briques.push_back(brique);
-        }             
-    }
+
     for (Brique brique : briques) 
     {
         DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, WHITE);
@@ -144,10 +142,25 @@ void draw()
     EndDrawing();
 }
 
+Vector3 xyz{0,1,2};
+
 void load() 
 {
     InitWindow(LARGEUR_ECRAN, HAUTEUR_ECRAN, "CasseBrique");
     SetTargetFPS(60);
+
+    // On ajoute les briques à casser
+    for (int ligne = 0; ligne < BRIQUES_LIGNES; ligne++)
+    {
+        for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++)
+        {
+            Brique br = { { (const float)BRIQUE_LARGEUR * colonne, (const float)BRIQUE_HAUTEUR * ligne, brique.rect.width - BRIQUE_SEPARATEUR, brique.rect.height - BRIQUE_SEPARATEUR} };
+            briques.push_back(br);
+        }
+    }
+
+    
+
 }
 
 void unload() 
