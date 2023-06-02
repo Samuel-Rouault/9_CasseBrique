@@ -20,7 +20,7 @@ const int BRIQUES_LIGNES = 5;
 const int BRIQUES_COLONNES = 10;
 const int BRIQUE_SEPARATEUR = 2;
 
-Rectangle balle{ 20, 50, BALLE_TAILLE,BALLE_TAILLE };
+Rectangle balle{ 400, 550, BALLE_TAILLE,BALLE_TAILLE };
 int vitesseBalleX = BALLE_VITESSE;
 int vitesseBalleY = -BALLE_VITESSE;
 
@@ -42,8 +42,6 @@ struct Brique
 Brique brique { { 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR } };    //Predfab brique
 vector <Brique> briques{};
 
-
-
 // Initialisation des fonctions
 
 void load();
@@ -52,6 +50,8 @@ void update();
 void draw();
 bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle);
 void rebondSurRaquette();
+bool collisionBriqueBalle(Rectangle balle, vector<Brique> briques);
+
 
 int main()
 {
@@ -121,6 +121,13 @@ void update()
         rebondSurRaquette();
     }
 
+    // Gestion de la collision entre la balle est les briques
+
+    if (collisionBriqueBalle(balle, briques)) 
+    {
+        rebondSurRaquette();
+    }
+
 }
 
 void draw() 
@@ -133,6 +140,7 @@ void draw()
     DrawRectangle(balle.x, balle.y, balle.width, balle.height, WHITE);
     DrawRectangle(raquette.x, raquette.y, raquette.width, raquette.height, WHITE);
 
+    // On dessine les briques
 
     for (Brique brique : briques) 
     {
@@ -150,6 +158,7 @@ void load()
     SetTargetFPS(60);
 
     // On ajoute les briques à casser
+
     for (int ligne = 0; ligne < BRIQUES_LIGNES; ligne++)
     {
         for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++)
@@ -158,9 +167,6 @@ void load()
             briques.push_back(br);
         }
     }
-
-    
-
 }
 
 void unload() 
@@ -182,6 +188,27 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle)
     int yMaxBalle = balle.y + balle.height;
 
     return(!(xMinRaquette > xMaxBalle || xMaxRaquette < xMinBalle || yMinRaquette > yMaxBalle || yMaxRaquette < yMinBalle));
+}
+
+// Fonction pour verifier s'il y a ue collision entre une brique et la balle
+
+bool collisionBriqueBalle(Rectangle balle, vector<Brique> briques)
+{
+    int xMinBalle = balle.x;
+    int xMaxBalle = balle.x + balle.width;
+    int yMinBalle = balle.y;
+    int yMaxBalle = balle.y + balle.height;
+    
+   
+    for (int i = 0; i < briques.size(); i++)
+    {
+        int xMinBrique = brique[i].x;
+        int xMaxBrique = brique.rect.x + brique.rect.width;
+        int yMinBrique = brique.rect.y;
+        int yMaxBrique = brique.rect.y + brique.rect.height;
+        return(!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique));
+    }
+    
 }
 
 // Fonction pour renvoyer la balle dans la direction opposée à la collision
