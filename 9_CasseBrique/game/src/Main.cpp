@@ -50,8 +50,6 @@ void update();
 void draw();
 bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle);
 void rebondSurRaquette();
-bool collisionBriqueBalle(Rectangle balle, vector<Brique> briques);
-
 
 int main()
 {
@@ -122,12 +120,22 @@ void update()
     }
 
     // Gestion de la collision entre la balle est les briques
-
-    if (collisionBriqueBalle(balle, briques)) 
+   
+    for (int i = 0; i < briques.size(); i++)
     {
-        rebondSurRaquette();
+        int xMinBalle = balle.x;
+        int xMaxBalle = balle.x + balle.width;
+        int yMinBalle = balle.y;
+        int yMaxBalle = balle.y + balle.height;
+        int xMinBrique = briques[i].rect.x;
+        int xMaxBrique = briques[i].rect.x + briques[i].rect.width;
+        int yMinBrique = briques[i].rect.y;
+        int yMaxBrique = briques[i].rect.y + briques[i].rect.height;
+        if (!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique)) 
+        {
+            vitesseBalleY = -vitesseBalleY;
+        }
     }
-
 }
 
 void draw() 
@@ -188,27 +196,6 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle)
     int yMaxBalle = balle.y + balle.height;
 
     return(!(xMinRaquette > xMaxBalle || xMaxRaquette < xMinBalle || yMinRaquette > yMaxBalle || yMaxRaquette < yMinBalle));
-}
-
-// Fonction pour verifier s'il y a ue collision entre une brique et la balle
-
-bool collisionBriqueBalle(Rectangle balle, vector<Brique> briques)
-{
-    int xMinBalle = balle.x;
-    int xMaxBalle = balle.x + balle.width;
-    int yMinBalle = balle.y;
-    int yMaxBalle = balle.y + balle.height;
-    
-   
-    for (int i = 0; i < briques.size(); i++)
-    {
-        int xMinBrique = brique[i].x;
-        int xMaxBrique = brique.rect.x + brique.rect.width;
-        int yMinBrique = brique.rect.y;
-        int yMaxBrique = brique.rect.y + brique.rect.height;
-        return(!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique));
-    }
-    
 }
 
 // Fonction pour renvoyer la balle dans la direction opposée à la collision
