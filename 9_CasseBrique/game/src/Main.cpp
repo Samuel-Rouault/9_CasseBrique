@@ -34,12 +34,13 @@ Rectangle raquette{ RAQUETTE_POSITIONX,RAQUETTE_POSITIONY,RAQUETTE_LARGEUR,RAQUE
 struct Brique 
 {
     Rectangle rect;
+    bool visible;
 };
 
 /// <summary>
 /// x / y / width / height
 /// </summary>
-Brique brique { { 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR } };    //Predfab brique
+Brique brique{ { 0,0,BRIQUE_LARGEUR,BRIQUE_HAUTEUR }, true };    //Predfab brique
 vector <Brique> briques{};
 
 // Initialisation des fonctions
@@ -75,18 +76,22 @@ void update()
     if (balle.y < 0) 
     {
         vitesseBalleY = -vitesseBalleY;
+        balle.y = 0;
     }
     if (balle.y > HAUTEUR_ECRAN - BALLE_TAILLE) 
     {
         vitesseBalleY = -vitesseBalleY;
+        balle.y = HAUTEUR_ECRAN-BALLE_TAILLE;
     }
     if (balle.x < 0) 
     {
         vitesseBalleX = -vitesseBalleX;
+        balle.x = 0;
     }
     if (balle.x > LARGEUR_ECRAN - BALLE_TAILLE) 
     {
         vitesseBalleX = -vitesseBalleX;
+        balle.x = LARGEUR_ECRAN - BALLE_TAILLE;
     }
 
     // Déplacement de la raquette du joueur
@@ -133,7 +138,14 @@ void update()
         int yMaxBrique = briques[i].rect.y + briques[i].rect.height;
         if (!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique)) 
         {
+            if (!briques[i].visible) 
+            {
+                continue;
+            }
+            //balle.y = yMinBrique + BALLE_TAILLE + 10;
             vitesseBalleY = -vitesseBalleY;
+            briques[i].visible = false;
+            
         }
     }
 }
@@ -150,9 +162,13 @@ void draw()
 
     // On dessine les briques
 
-    for (Brique brique : briques) 
+    for (Brique& brique : briques) 
     {
-        DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, WHITE);
+        if (brique.visible) 
+        {
+            DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, WHITE);
+        }
+       
     }
    
     EndDrawing();
@@ -171,7 +187,7 @@ void load()
     {
         for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++)
         {
-            Brique br = { { (const float)BRIQUE_LARGEUR * colonne, (const float)BRIQUE_HAUTEUR * ligne, brique.rect.width - BRIQUE_SEPARATEUR, brique.rect.height - BRIQUE_SEPARATEUR} };
+            Brique br = { { (const float)BRIQUE_LARGEUR * colonne, (const float)BRIQUE_HAUTEUR * ligne, brique.rect.width - BRIQUE_SEPARATEUR, brique.rect.height - BRIQUE_SEPARATEUR},true };
             briques.push_back(br);
         }
     }
@@ -195,7 +211,7 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle)
     int yMinBalle = balle.y;
     int yMaxBalle = balle.y + balle.height;
 
-    return(!(xMinRaquette > xMaxBalle || xMaxRaquette < xMinBalle || yMinRaquette > yMaxBalle || yMaxRaquette < yMinBalle));
+    return(!(xMinBalle> xMaxRaquette || yMinBalle > yMaxRaquette|| xMaxBalle < xMinRaquette ||  yMaxBalle < yMinRaquette));
 }
 
 // Fonction pour renvoyer la balle dans la direction opposée à la collision
