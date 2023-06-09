@@ -1,6 +1,9 @@
 #include "raylib.h"
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <string>
 
 using namespace std;
 // Initialisation des variables
@@ -19,12 +22,18 @@ const int BRIQUE_HAUTEUR = 40;
 const int BRIQUES_LIGNES = 5;
 const int BRIQUES_COLONNES = 10;
 const int BRIQUE_SEPARATEUR = 2;
+const int POSITION_BALLEX = RAQUETTE_POSITIONX;
+const int POSITION_BALLEY = RAQUETTE_POSITIONY - BALLE_TAILLE;
+const int VIE_DEPART = 3;
 
-Rectangle balle{ 400, 550, BALLE_TAILLE,BALLE_TAILLE };
+Rectangle balle{ POSITION_BALLEX, POSITION_BALLEY, BALLE_TAILLE,BALLE_TAILLE };
 int vitesseBalleX = BALLE_VITESSE;
 int vitesseBalleY = -BALLE_VITESSE;
 
 Rectangle raquette{ RAQUETTE_POSITIONX,RAQUETTE_POSITIONY,RAQUETTE_LARGEUR,RAQUETTE_HAUTEUR };
+
+int vie = VIE_DEPART;
+int etatJeu = 0;
 
 // Structure de la brique
 
@@ -35,6 +44,7 @@ struct Brique
 {
     Rectangle rect;
     bool visible;
+    Color color;
 };
 
 /// <summary>
@@ -51,9 +61,12 @@ void update();
 void draw();
 bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle);
 void rebondSurRaquette();
+void relancerBalle();
 
 int main()
 {
+    srand(time(nullptr));
+
     load();
     while (WindowShouldClose) 
     {
@@ -76,12 +89,16 @@ void update()
     if (balle.y < 0) 
     {
         vitesseBalleY = -vitesseBalleY;
-        balle.y = 0;
     }
     if (balle.y > HAUTEUR_ECRAN - BALLE_TAILLE) 
     {
-        vitesseBalleY = -vitesseBalleY;
-        balle.y = HAUTEUR_ECRAN-BALLE_TAILLE;
+        --vie;
+        // Changement de l'état du jeu si le joueur n'a plus de vie
+        if (vie <= 0)
+        {
+            etatJeu = 1;
+        }
+        relancerBalle();
     }
     if (balle.x < 0) 
     {
@@ -144,10 +161,17 @@ void update()
             }
             //balle.y = yMinBrique + BALLE_TAILLE + 10;
             vitesseBalleY = -vitesseBalleY;
-            briques[i].visible = false;
-            
+            briques[i].visible = false;           
         }
     }
+
+    // Vérifier si le joueur à perdu
+
+    if (etatJeu == 1) 
+    {
+
+    }
+    
 }
 
 void draw() 
@@ -166,10 +190,13 @@ void draw()
     {
         if (brique.visible) 
         {
-            DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, WHITE);
-        }
-       
+            DrawRectangle(brique.rect.x, brique.rect.y, brique.rect.width, brique.rect.height, brique.color);
+        }      
     }
+
+    // On dessine le nombre de vies du joueur
+
+    DrawText(to_string(vie).c_str(), LARGEUR_ECRAN / 8, HAUTEUR_ECRAN / 1.5, 40, RED);
    
     EndDrawing();
 }
@@ -187,8 +214,14 @@ void load()
     {
         for (int colonne = 0; colonne < BRIQUES_COLONNES; colonne++)
         {
-            Brique br = { { (const float)BRIQUE_LARGEUR * colonne, (const float)BRIQUE_HAUTEUR * ligne, brique.rect.width - BRIQUE_SEPARATEUR, brique.rect.height - BRIQUE_SEPARATEUR},true };
+            // On créer une couleur différente pour chaque brique
+            char randomColorR = rand() % 255 + 1;
+            char randomColorG = rand() % 255 + 1;
+            char randomColorB = rand() % 255 + 1;
+            Color color = { randomColorR,randomColorG,randomColorB,255 };
+            Brique br = { { (const float)BRIQUE_LARGEUR * colonne, (const float)BRIQUE_HAUTEUR * ligne, brique.rect.width - BRIQUE_SEPARATEUR, brique.rect.height - BRIQUE_SEPARATEUR},true,color };
             briques.push_back(br);
+            
         }
     }
 }
@@ -219,4 +252,9 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle)
 void rebondSurRaquette() 
 {
     vitesseBalleY = -vitesseBalleY;
+}
+void relancerBalle() 
+{
+    balle.x = POSITION_BALLEX;
+    balle.y = POSITION_BALLEY;
 }
