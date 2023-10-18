@@ -105,6 +105,7 @@ void update()
             vitesseBalleY = -vitesseBalleY;
             PlaySound(sonCollisionMur);
         }
+        // Verification des vies perdues quand la balle passe le bas de l'écran
         if (balle.y > HAUTEUR_ECRAN - BALLE_TAILLE)
         {
             --vie;
@@ -116,12 +117,14 @@ void update()
                 etatJeu = 1;
             }
         }
+        // Collision avec le bord gauche de l'écran
         if (balle.x < 0)
         {
             vitesseBalleX = -vitesseBalleX;
             balle.x = 0;
             PlaySound(sonCollisionMur);
         }
+        // Collision avec le bord droit de l'écran
         if (balle.x > LARGEUR_ECRAN - BALLE_TAILLE)
         {
             vitesseBalleX = -vitesseBalleX;
@@ -171,12 +174,11 @@ void update()
             int xMaxBrique = briques[i].rect.x + briques[i].rect.width;
             int yMinBrique = briques[i].rect.y;
             int yMaxBrique = briques[i].rect.y + briques[i].rect.height;
+
             if (!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique))
             {
-                if (!briques[i].visible)
-                {
-                    continue;
-                }
+                if (!briques[i].visible) continue;
+
                 //balle.y = yMinBrique + BALLE_TAILLE + 10;
                 vitesseBalleY = -vitesseBalleY;
                 briques[i].visible = false;
@@ -286,7 +288,7 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle)
     int yMinBalle = balle.y;
     int yMaxBalle = balle.y + balle.height;
 
-    return(!(xMinBalle> xMaxRaquette || yMinBalle > yMaxRaquette|| xMaxBalle < xMinRaquette ||  yMaxBalle < yMinRaquette));
+    return(!(xMinBalle > xMaxRaquette || yMinBalle > yMaxRaquette || xMaxBalle < xMinRaquette ||  yMaxBalle < yMinRaquette));
 }
 
 // Fonction pour renvoyer la balle dans la direction opposée à la collision
