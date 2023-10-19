@@ -74,6 +74,7 @@ bool collisionRaquetteBalle(Rectangle raquette, Rectangle balle);
 void rebondSurRaquette();
 void relancerBalle();
 void relancerPartie();
+int coordBriqueVersIndex(int ligneBrique, int colonneBrique);
 
 int main()
 {
@@ -157,35 +158,54 @@ void update()
 
         // Gestion de la collision entre le joueur et la balle
 
-        if (collisionRaquetteBalle(raquette, balle))
+        if (CheckCollisionRecs(raquette, balle)) {
+            balle.y = RAQUETTE_POSITIONY - BALLE_TAILLE;
+            vitesseBalleY = -vitesseBalleY;
+            PlaySound(sonCollisionRaquette);
+        }
+        /*if (collisionRaquetteBalle(raquette, balle))
         {
             rebondSurRaquette();
-        }
+        }*/
 
         // Gestion de la collision entre la balle est les briques
 
-        for (int i = 0; i < briques.size(); i++)
+        //for (int i = 0; i < briques.size(); i++)
+        //{
+        //    int xMinBalle = balle.x;
+        //    int xMaxBalle = balle.x + balle.width;
+        //    int yMinBalle = balle.y;
+        //    int yMaxBalle = balle.y + balle.height;
+        //    int xMinBrique = briques[i].rect.x;
+        //    int xMaxBrique = briques[i].rect.x + briques[i].rect.width;
+        //    int yMinBrique = briques[i].rect.y;
+        //    int yMaxBrique = briques[i].rect.y + briques[i].rect.height;
+
+        //    if (!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique))
+        //    {
+        //        if (!briques[i].visible) continue;
+
+        //        //balle.y = yMinBrique + BALLE_TAILLE + 10;
+        //        vitesseBalleY = -vitesseBalleY;
+        //        briques[i].visible = false;
+        //        nbBriques--;
+        //        PlaySound(sonDegatBrique);
+        //    }
+        //}
+
+        // Nouvelle version des collisions balles briques
+      
+        int colonneBrique = (balle.x+BALLE_TAILLE/2) / BRIQUE_LARGEUR;
+        int ligneBrique = balle.y / BRIQUE_HAUTEUR;
+        int index = coordBriqueVersIndex(ligneBrique, colonneBrique);
+        if (index >= 0 && index < totalBrique && briques[index].visible) 
         {
-            int xMinBalle = balle.x;
-            int xMaxBalle = balle.x + balle.width;
-            int yMinBalle = balle.y;
-            int yMaxBalle = balle.y + balle.height;
-            int xMinBrique = briques[i].rect.x;
-            int xMaxBrique = briques[i].rect.x + briques[i].rect.width;
-            int yMinBrique = briques[i].rect.y;
-            int yMaxBrique = briques[i].rect.y + briques[i].rect.height;
-
-            if (!(xMinBalle > xMaxBrique || xMaxBalle < xMinBrique || yMinBalle > yMaxBrique || yMaxBalle < yMinBrique))
-            {
-                if (!briques[i].visible) continue;
-
-                //balle.y = yMinBrique + BALLE_TAILLE + 10;
-                vitesseBalleY = -vitesseBalleY;
-                briques[i].visible = false;
-                nbBriques--;
-                PlaySound(sonDegatBrique);
-            }
+            vitesseBalleY = -vitesseBalleY;
+            briques[index].visible = false;
+            nbBriques--;
+            PlaySound(sonDegatBrique);
         }
+            
         if (nbBriques <= 0) 
         {
             etatJeu = 2;
@@ -324,4 +344,8 @@ void relancerPartie()
             brique.visible = true;
         }
     }   
+}
+int coordBriqueVersIndex(int ligneBrique, int colonneBrique)
+{
+    return ligneBrique * BRIQUES_COLONNES + colonneBrique;
 }
